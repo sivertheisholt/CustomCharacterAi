@@ -2,7 +2,7 @@
   "dependencies": {
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
-    "node_characterai": "^1.1.8"
+    "node_characterai": "^1.2.5"
   },
   "name": "customcharacterai",
   "description": "This rep is for my own character ai - Deployment to my own server",
