@@ -7,9 +7,13 @@ const CharacterAI = require("node_characterai");
 const app = express();
 app.use(express.json());
 
+const characterAI = new CharacterAI();
+let characterId = "";
+let chat;
+
 const setupCai = async (accessToken) => {
   try {
-    const characterAI = new CharacterAI();
+    if (characterAI.isAuthenticated()) return characterAI;
     characterAI.requester.puppeteerPath = "/usr/bin/google-chrome";
     await characterAI.authenticateWithToken(accessToken);
     return characterAI;
@@ -47,7 +51,10 @@ async function setup() {
 
       const cai = await setupCai(accessToken);
 
-      const chat = await cai.createOrContinueChat(character_id);
+      if (characterId != character_id) {
+        chat = await cai.createOrContinueChat(character_id);
+        characterId = character_id;
+      }
 
       const response = await chat.sendAndAwaitResponse(text, true);
 
