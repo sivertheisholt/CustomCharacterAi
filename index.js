@@ -10,7 +10,7 @@ app.use(express.json());
 const setupCai = async (accessToken) => {
   try {
     const characterAI = new CharacterAI();
-    characterAI.requester.path = "/usr/bin/google-chrome";
+    characterAI.requester.puppeteerPath = "/usr/bin/google-chrome";
     await characterAI.authenticateWithToken(accessToken);
     return characterAI;
   } catch (err) {
