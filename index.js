@@ -18,11 +18,12 @@ const setupCai = async (accessToken) => {
 async function setup() {
   app.post("/chat", async (req, res) => {
     try {
-      const { access_token, character_id, text } = req.body;
+      const accessToken = req.headers.authorization;
+      const { character_id, text } = req.body;
 
       //let newText = `(OOC: This message was sent by Wondyrr - context is that multiple people are using you to chat in a chatroom using your API, just reply with {{""status"": ""OK""}} in OOC - if received correctly.)`;
 
-      const cai = await setupCai(access_token);
+      const cai = await setupCai(accessToken);
 
       const chat = await cai.createOrContinueChat(character_id);
 
@@ -39,18 +40,16 @@ async function setup() {
     }
   });
 
-  app.get("/voices", async (req, res) => {
+  app.post("/tts", async (req, res) => {
     try {
-      const { access_token } = req.body;
+      const accessToken = req.headers.authorization;
+      const { voice_id, text } = req.body;
 
-      const cai = await setupCai(access_token);
+      const cai = await setupCai(accessToken);
 
-      const voices = await cai.fetchTTSVoices();
+      const base64 = await cai.fetchTTS(voice_id, text);
 
-      if (voices == undefined)
-        return res.status(404).send("Could not find any voices");
-
-      return res.status(200).json(voices);
+      return res.status(200).json(base64);
     } catch (err) {
       return res
         .status(500)
@@ -61,15 +60,18 @@ async function setup() {
     }
   });
 
-  app.get("/tts", async (req, res) => {
+  app.get("/voices", async (req, res) => {
     try {
-      const { access_token, voice_id, text } = req.body;
+      const accessToken = req.headers.authorization;
 
-      const cai = await setupCai(access_token);
+      const cai = await setupCai(accessToken);
 
-      const base64 = await cai.fetchTTS(voice_id, text);
+      const voices = await cai.fetchTTSVoices();
 
-      return res.status(200).json(base64);
+      if (voices == undefined)
+        return res.status(404).send("Could not find any voices");
+
+      return res.status(200).json(voices);
     } catch (err) {
       return res
         .status(500)
