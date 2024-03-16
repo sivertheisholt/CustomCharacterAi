@@ -8,14 +8,35 @@ const app = express();
 app.use(express.json());
 
 const setupCai = async (accessToken) => {
-  const characterAI = new CharacterAI();
-  characterAI.requester.usePlus = true;
-  characterAI.requester.forceWaitingRoom = false;
-  await characterAI.authenticateWithToken(accessToken);
-  return characterAI;
+  try {
+    const characterAI = new CharacterAI();
+    await characterAI.authenticateWithToken(accessToken);
+    return characterAI;
+  } catch (err) {
+    console.log("Could not setup CAI: " + err);
+    return null;
+  }
 };
 
 async function setup() {
+  app.get("/health", async (req, res) => {
+    try {
+      const accessToken = req.headers.authorization;
+      const cai = await setupCai(accessToken);
+
+      if (cai == null) return res.status(500).send("Invalid token");
+
+      return res.status(200).send();
+    } catch (err) {
+      return res
+        .status(500)
+        .send(
+          "Something wrong happen when trying to connect with Character AI" +
+            err
+        );
+    }
+  });
+
   app.post("/chat", async (req, res) => {
     try {
       const accessToken = req.headers.authorization;
