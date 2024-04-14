@@ -27,8 +27,8 @@ async function setup() {
   app.get("/health", async (req, res) => {
     try {
       const accessToken = req.headers.authorization;
-      const cai = await setupCai(accessToken);
 
+      const cai = await setupCai(accessToken);
       if (cai == null) return res.status(500).send("Invalid token");
 
       return res.status(200).send();
