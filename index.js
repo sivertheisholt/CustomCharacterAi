@@ -47,16 +47,21 @@ async function setup() {
       const accessToken = req.headers.authorization;
       const { character_id, text } = req.body;
 
-      //let newText = `(OOC: This message was sent by Wondyrr - context is that multiple people are using you to chat in a chatroom using your API, just reply with {{""status"": ""OK""}} in OOC - if received correctly.)`;
-
       const cai = await setupCai(accessToken);
+      if (cai == null) return res.status(500).send("CAI is not authenticated");
 
       if (characterId != character_id) {
-        chat = await cai.createOrContinueChat(character_id);
+        const newChat = await cai.createOrContinueChat(character_id);
+        if (newChat instanceof Error)
+          return res.status(500).send("Something went wrong");
+
+        chat = newChat;
         characterId = character_id;
       }
 
       const response = await chat.sendAndAwaitResponse(text, true);
+      if (response instanceof Error)
+        return res.status(500).send("Something went wrong");
 
       return res.status(200).json(response.text);
     } catch (err) {
@@ -75,8 +80,11 @@ async function setup() {
       const { voice_id, text } = req.body;
 
       const cai = await setupCai(accessToken);
+      if (cai == null) return res.status(500).send("CAI is not authenticated");
 
       const base64 = await cai.fetchTTS(voice_id, text);
+      if (response instanceof Error)
+        return res.status(500).send("Something went wrong");
 
       return res.status(200).json(base64);
     } catch (err) {
@@ -94,8 +102,11 @@ async function setup() {
       const accessToken = req.headers.authorization;
 
       const cai = await setupCai(accessToken);
+      if (cai == null) return res.status(500).send("CAI is not authenticated");
 
       const voices = await cai.fetchTTSVoices();
+      if (response instanceof Error)
+        return res.status(500).send("Something went wrong");
 
       if (voices == undefined)
         return res.status(404).send("Could not find any voices");
