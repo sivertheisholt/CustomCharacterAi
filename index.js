@@ -83,7 +83,7 @@ async function setup() {
       if (cai == null) return res.status(500).send("CAI is not authenticated");
 
       const base64 = await cai.fetchTTS(voice_id, text);
-      if (response instanceof Error)
+      if (base64 instanceof Error)
         return res.status(500).send("Something went wrong");
 
       return res.status(200).json(base64);
@@ -105,7 +105,7 @@ async function setup() {
       if (cai == null) return res.status(500).send("CAI is not authenticated");
 
       const voices = await cai.fetchTTSVoices();
-      if (response instanceof Error)
+      if (voices instanceof Error)
         return res.status(500).send("Something went wrong");
 
       if (voices == undefined)
