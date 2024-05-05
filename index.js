@@ -33,6 +33,7 @@ async function setup() {
 
       return res.status(200).send();
     } catch (err) {
+      console.log(err);
       return res
         .status(500)
         .send(
@@ -52,19 +53,28 @@ async function setup() {
 
       if (characterId != character_id) {
         const newChat = await cai.createOrContinueChat(character_id);
-        if (newChat instanceof Error)
+        if (newChat instanceof Error) {
+          console.log(
+            "Something went wrong when starting chat: " + newChat.message
+          );
           return res.status(500).send("Something went wrong");
+        }
 
         chat = newChat;
         characterId = character_id;
       }
 
       const response = await chat.sendAndAwaitResponse(text, true);
-      if (response instanceof Error)
+      if (response instanceof Error) {
+        console.log(
+          "Something went wrong getting chat response: " + response.message
+        );
         return res.status(500).send("Something went wrong");
+      }
 
       return res.status(200).json(response.text);
     } catch (err) {
+      console.log(err);
       return res
         .status(500)
         .send(
@@ -83,11 +93,14 @@ async function setup() {
       if (cai == null) return res.status(500).send("CAI is not authenticated");
 
       const base64 = await cai.fetchTTS(voice_id, text);
-      if (base64 instanceof Error)
+      if (base64 instanceof Error) {
+        console.log("Something went wrong getting TTS: " + base64.message);
         return res.status(500).send("Something went wrong");
+      }
 
       return res.status(200).json(base64);
     } catch (err) {
+      console.log(err);
       return res
         .status(500)
         .send(
@@ -105,14 +118,17 @@ async function setup() {
       if (cai == null) return res.status(500).send("CAI is not authenticated");
 
       const voices = await cai.fetchTTSVoices();
-      if (voices instanceof Error)
+      if (voices instanceof Error) {
+        console.log("Something went wrong getting voices: " + voices.message);
         return res.status(500).send("Something went wrong");
+      }
 
       if (voices == undefined)
         return res.status(404).send("Could not find any voices");
 
       return res.status(200).json(voices);
     } catch (err) {
+      console.log(err);
       return res
         .status(500)
         .send(
