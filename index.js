@@ -7,6 +7,8 @@ const CharacterAI = require("node_characterai");
 const app = express();
 app.use(express.json());
 
+const usePlus = process.env.USE_PLUS;
+
 const characterAI = new CharacterAI();
 let characterId = "";
 let chat;
@@ -15,6 +17,7 @@ const setupCai = async (accessToken) => {
   try {
     if (characterAI.isAuthenticated()) return characterAI;
     characterAI.requester.puppeteerPath = "/usr/bin/google-chrome";
+    characterAI.requester.usePlus = usePlus;
     await characterAI.authenticateWithToken(accessToken);
     return characterAI;
   } catch (err) {
